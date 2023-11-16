@@ -3,12 +3,13 @@ import httpx
 import asyncio
 
 
-async def mint(rpc, private_key, maxFeePerGas, maxPriorityFeePerGas, data):
+async def mint(to, rpc, private_key, maxFeePerGas, maxPriorityFeePerGas, data):
     RPC = rpc
     web3 = AsyncWeb3(AsyncWeb3.AsyncHTTPProvider(RPC))
     account = web3.eth.account.from_key(private_key)
     http = httpx.AsyncClient()
     chain_id = await web3.eth.chain_id
+    to = web3.to_checksum_address(to)
     nonce = await web3.eth.get_transaction_count(account.address)
     maxFeePerGas = int(maxFeePerGas)
     maxPriorityFeePerGas = int(maxPriorityFeePerGas)
@@ -19,7 +20,7 @@ async def mint(rpc, private_key, maxFeePerGas, maxPriorityFeePerGas, data):
         for i in range(0, 100):
             tx = {
                 'from': account.address,
-                'to': account.address,
+                'to': to,
                 'nonce': nonce,
                 'gas': 25024,
                 'maxFeePerGas': maxFeePerGas,
@@ -36,9 +37,17 @@ async def mint(rpc, private_key, maxFeePerGas, maxPriorityFeePerGas, data):
 
 if __name__ == '__main__':
     print('hdd.cm, 推特低至2毛')
-    _private_key = input('输入私钥：').strip()
+    _to = input('输入地址(打到那个号)：').strip()
+    _private_key = input('输入私钥(有gas的小号)：').strip()
     _rpc = input('输入RPC：').strip()
     _maxFeePerGas = input('输入maxFeePerGas：').strip()
     _maxPriorityFeePerGas = input('输入maxPriorityFeePerGas：').strip()
     _data = input('输入data：').strip()
-    asyncio.run(mint(_rpc, _private_key, _maxFeePerGas, _maxPriorityFeePerGas, _data))
+    asyncio.run(mint(_to, _rpc, _private_key, _maxFeePerGas, _maxPriorityFeePerGas, _data))
+
+
+
+
+
+
+
