@@ -12,8 +12,10 @@
 
 适用于evm.ink所有无编号铭文
 
-可能会卡很多交易，最好专门搞个小号跑这玩意
+输入地址为铭文接收地址，也就是你大号地址
 
-按提示，输入私钥，RPC（打那个链输哪个），maxFeePerGas，maxPriorityFeePerGas，data（16进制数据，复制小狐狸的）
+**输入的私钥为付gas地址，由于可能卡nonce，请新建个小号，放gas进去，打完转走gas**
+
+按提示，RPC（打那个链输哪个），maxFeePerGas，maxPriorityFeePerGas，data（16进制数据，复制小狐狸的）
 
 一包100个，循环100包，数量可以自己改下
