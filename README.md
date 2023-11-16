@@ -19,3 +19,5 @@
 按提示，RPC（打那个链输哪个），maxFeePerGas，maxPriorityFeePerGas，data（16进制数据，复制小狐狸的）
 
 一包100个，循环100包，数量可以自己改下
+
+多跑几遍，直到打完你小号gas即可。
