@@ -10,7 +10,7 @@ pip install httpx
 # 自动打包
 右边Releases里打包好的exe是Github Action自动打包
 
-打包脚本.github/workflows/main.yml
+打包脚本[.github/workflows/main.yml](.github/workflows/main.yml)
 
 可以自行Fork仓库，自己去Action→发布软件→Run workflow
 
