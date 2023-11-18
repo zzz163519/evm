@@ -55,5 +55,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true # 覆盖文件
           tag: "auto"
-          body: "更新" # 输出
+          body: |
+            - Github Actions自动打包
+            - hdd.cm 推特低至2毛
           artifacts: "window/*.exe"
