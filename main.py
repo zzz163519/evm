@@ -21,12 +21,18 @@ async def mint(to, rpc, private_key, gasPrice, maxFeePerGas, maxPriorityFeePerGa
         'to': to,
         'nonce': nonce,
         'gas': 25024,
-        'gasPrice': None if gasPrice == 0 else gasPrice,
-        'maxFeePerGas': maxFeePerGas if gasPrice == 0 else None,
-        'maxPriorityFeePerGas': maxPriorityFeePerGas if gasPrice == 0 else None,
+        'gasPrice': gasPrice,
+        'maxFeePerGas': maxFeePerGas,
+        'maxPriorityFeePerGas': maxPriorityFeePerGas,
         'chainId': chain_id,
         'data': data
     }
+
+    if gasPrice == 0:
+        del tx['gasPrice']
+    else:
+        del tx['maxFeePerGas']
+        del tx['maxPriorityFeePerGas']
 
     match = re.search(r'\[(\d+)-(\d+)\]', data)
     if match:
