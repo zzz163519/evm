@@ -8,6 +8,7 @@ async def mint(to, rpc, private_key, gasPrice, maxFeePerGas, maxPriorityFeePerGa
     web3 = AsyncWeb3(AsyncWeb3.AsyncHTTPProvider(rpc))
     account = web3.eth.account.from_key(private_key)
     http = httpx.AsyncClient()
+
     chain_id = await web3.eth.chain_id
     to = web3.to_checksum_address(to)
     nonce = await web3.eth.get_transaction_count(account.address)
@@ -20,40 +21,30 @@ async def mint(to, rpc, private_key, gasPrice, maxFeePerGas, maxPriorityFeePerGa
         'to': to,
         'nonce': nonce,
         'gas': 25024,
-        'gasPrice': gasPrice,
-        'maxFeePerGas': maxFeePerGas,
-        'maxPriorityFeePerGas': maxPriorityFeePerGas,
+        'gasPrice': None if gasPrice == 0 else gasPrice,
+        'maxFeePerGas': maxFeePerGas if gasPrice == 0 else None,
+        'maxPriorityFeePerGas': maxPriorityFeePerGas if gasPrice == 0 else None,
         'chainId': chain_id,
         'data': data
     }
 
-    if gasPrice == 0:
-        del tx['gasPrice']
+    match = re.search(r'\[(\d+)-(\d+)\]', data)
+    if match:
+        start, end = map(int, match.groups())
+        subtext = match.group()
     else:
-        del tx['maxFeePerGas']
-        del tx['maxPriorityFeePerGas']
+        start, end, subtext = 0, 0, None
 
-    res = re.findall(r'\[(\d+)-(\d+)\]', data)
-    start, end, subtext = 0, 0, None
-    if len(res) > 0:
-        start = int(res[0][0])
-        end = int(res[0][1])
-        subtext = res[0][0] + '-' + res[0][1]
+    time = (end - start) // 100 + 1 if end - start > 10000 else 100
 
-    time = 100
-    if end - start > 10000:
-        time = (end - start) // 100 + 1
+    if not data.startswith('0x') and subtext is None:
+        data = web3.to_hex(text=data)
 
     for x in range(0, time):
         request_list = []
         for i in range(0, 100):
             tx['nonce'] = nonce
-            if subtext is None:
-                if data.startswith('0x'):
-                    tx['data'] = data
-                else:
-                    tx['data'] = web3.to_hex(text=data)
-            else:
+            if subtext is not None:
                 tx['data'] = data.replace(subtext, str(start))
                 start += 1
                 if start > end:
@@ -67,27 +58,37 @@ async def mint(to, rpc, private_key, gasPrice, maxFeePerGas, maxPriorityFeePerGa
         await asyncio.sleep(1)
 
 
-if __name__ == '__main__':
-    print('hdd.cm, 推特低至2毛')
-    _to = input('输入地址(打到那个号)：').strip()
-    _private_key = input('输入私钥(有gas的小号)：').strip()
-    _rpc = input('输入RPC：').strip()
+def get_input(prompt, check, error_msg):
+    while True:
+        data = input(prompt).strip()
+        if check(data):
+            return data.strip()
+        else:
+            print(error_msg)
 
-    _eip1559 = input('输入是否EIP1559(1为是，0为否)：').strip()
+
+async def main():
+    _to = get_input('输入地址(打到那个号)：', lambda addr: len(addr) == 42, '地址长度不对, 请检查后重新输入')
+    _private_key = get_input('输入私钥(有gas的小号)：', lambda key: len(key) == 64 or (key.startswith('0x') and len(key) == 66), '私钥长度不对, 请检查后重新输入')
+
+    _rpc = get_input('输入RPC：', lambda rpc: rpc.startswith('https://'), 'RPC格式不对, https://开头, 请检查后重新输入')
+    _eip1559 = get_input('输入是否EIP1559(1为是，0为否)：', lambda eip1559: eip1559 in ['0', '1'], '输入错误, 必须为0或1, 请检查后重新输入')
+
     if _eip1559 == '1':
         _gasPrice = 0
-        _maxFeePerGas = float(input('输入maxFeePerGas：').strip())
-        _maxPriorityFeePerGas = float(input('输入maxPriorityFeePerGas：').strip())
+        _maxFeePerGas = get_input('输入maxFeePerGas：', lambda maxFeePerGas: maxFeePerGas > 0, 'maxFeePerGas必须大于0, 请检查后重新输入')
+        _maxPriorityFeePerGas = get_input('输入maxPriorityFeePerGas：', lambda maxPriorityFeePerGas: maxPriorityFeePerGas > 0, 'maxPriorityFeePerGas必须大于0, 请检查后重新输入')
     else:
-        _gasPrice = float(input('输入gasPrice：').strip())
+        _gasPrice = get_input('输入gasPrice：', lambda gasPrice: gasPrice > 0, 'gasPrice必须大于0, 请检查后重新输入')
         _maxFeePerGas = 0
         _maxPriorityFeePerGas = 0
 
-    print('可以直接输入【data:,{"p":"asc-20","op":"mint","tick":"aval","amt":"10"}】格式')
-    print('也可以直接输入 0x646174613a2c7b 十六进制格式, 必须要有0x开头')
-    print('动态范围, 请用方括号加范围，如[3242-8765]代替： {"p":"asc-20","op":"mint","id":"[3242-8765]","tick":"aval","amt":"10"}')
-    print('注意只替换变动数字，不要替换其他的，如果有引号不要漏掉引号')
+    _data = get_input('输入data：', lambda data: len(data) > 0, 'data不能为空, 请检查后重新输入')
 
-    _data = input('输入data：').strip()
+    await mint(_to, _rpc, _private_key, _gasPrice, _maxFeePerGas, _maxPriorityFeePerGas, _data)
 
-    asyncio.run(mint(_to, _rpc, _private_key, _gasPrice, _maxFeePerGas, _maxPriorityFeePerGas, _data))
+
+if __name__ == '__main__':
+    print('hdd.cm, 推特低至2毛，一手资源，售后无忧')
+    print('https://github.com/Fooyao/evmink; 请仔细阅读README文档')
+    asyncio.run(main())
