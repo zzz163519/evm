@@ -76,10 +76,10 @@ async def main():
 
     if _eip1559 == '1':
         _gasPrice = 0
-        _maxFeePerGas = get_input('输入maxFeePerGas：', lambda maxFeePerGas: maxFeePerGas > 0, 'maxFeePerGas必须大于0, 请检查后重新输入')
-        _maxPriorityFeePerGas = get_input('输入maxPriorityFeePerGas：', lambda maxPriorityFeePerGas: maxPriorityFeePerGas > 0, 'maxPriorityFeePerGas必须大于0, 请检查后重新输入')
+        _maxFeePerGas = get_input('输入maxFeePerGas：', lambda maxFeePerGas: float(maxFeePerGas) > 0, 'maxFeePerGas必须大于0, 请检查后重新输入')
+        _maxPriorityFeePerGas = get_input('输入maxPriorityFeePerGas：', lambda maxPriorityFeePerGas: True, 'maxPriorityFeePerGas必须大于0, 请检查后重新输入')
     else:
-        _gasPrice = get_input('输入gasPrice：', lambda gasPrice: gasPrice > 0, 'gasPrice必须大于0, 请检查后重新输入')
+        _gasPrice = get_input('输入gasPrice：', lambda gasPrice: float(gasPrice) > 0, 'gasPrice必须大于0, 请检查后重新输入')
         _maxFeePerGas = 0
         _maxPriorityFeePerGas = 0
 
