@@ -10,23 +10,25 @@ jobs:
     name: 构建window软件
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.3.0
         with:
           submodules: recursive
-      - name: 编译环境设置 Python 3.11.6
-        uses: actions/setup-python@v4
+      - name: 编译环境设置 Python 3.9.13
+        uses: actions/setup-python@v4.5.0
         with:
-          python-version: "3.11.6"
+          python-version: "3.9.13"
           architecture: "x64"
       - name: 缓存加载
-        uses: actions/cache@v2
+        uses: actions/cache@v3.2.3
         id: cache
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ runner.os }}-python-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}
       - name: 安装依赖
         if: steps.cache.outputs.cache-hit != 'true'
-        run: pip install -r requirements.txt
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
       - name: 编译exe
         run: pyinstaller -F main.py
       - name: 上传exe
