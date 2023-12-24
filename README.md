@@ -1,8 +1,3 @@
-# 便宜Twitter令牌号：[hdd.cm](https://hdd.cm/)  单价低至0.2元
-
-**适用于所有EVM链**
-
-**适用于所有EVM链**
 
 # 依赖：
 ```
@@ -12,18 +7,14 @@ pip install httpx
 
 
 # 自动打包
-右边Releases里打包好的exe是Github Action自动打包
 
 打包脚本[.github/workflows/main.yml](.github/workflows/main.yml)
 
-可以自行Fork仓库，自己去Action→发布软件→Run workflow
-
-等待若干时间，会自动帮你打包好并发布到Releases。
 
 
 # 使用教程
 
-1. **输入地址**：这是你接收铭文的地址
+1. **输入地址**：这是你接收的地址
 2. **输入私钥**：付gas账号私钥
 3. **输入RPC**：打哪个链用哪个链的RPC，有的RPC不支持batchRequest，多换几个
 4. **输入是否EIP1559**：1159就是输入最大gasPrice，小费gasPrice那种，非1159就是直接输入gasPrice
