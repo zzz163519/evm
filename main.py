@@ -95,6 +95,5 @@ async def main():
 
 
 if __name__ == '__main__':
-    print('hdd.cm, 推特低至2毛，一手资源，售后无忧')
-    print('https://github.com/Fooyao/evmink; 请仔细阅读README文档')
+    print('success')
     asyncio.run(main())
